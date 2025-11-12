@@ -1,0 +1,177 @@
+{% extends 'parent.html' %} {% block title %}
+<title>Your Shopping Cart</title>
+{% endblock title %} {% block body %}
+
+<div class="w-full flex flex-col gap-16">
+  <div class="w-full flex flex-col">
+    <h1 class="text-2xl font-bold text-center py-4">Your Shopping Cart</h1>
+
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b">
+            <th class="px-6 py-3 text-left">Product</th>
+            <th class="px-6 py-3 text-left">Price</th>
+            <th class="px-6 py-3 text-left">Quantity</th>
+            <th class="px-6 py-3 text-left">Total</th>
+            <th class="px-6 py-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+          <tr class="border-b">
+            <td class="px-6 py-4">
+              <a
+                href="{{ url_for('public.product_details', product_id=item.product.id) }}"
+              >
+                <img
+                  src="{{ item.product.image }}"
+                  alt="{{ item.product.name }}"
+                  class="w-16 h-16 object-cover rounded-md"
+                />
+                <span class="ml-2">{{ item.product.name }}</span>
+              </a>
+            </td>
+            <td class="px-6 py-4">৳{{ item.product.price }}</td>
+            <td class="px-6 py-4">
+              <form
+                action="{{ url_for('order.add_to_cart') }}"
+                method="post"
+                class="flex items-center"
+              >
+                <input
+                  type="hidden"
+                  name="product_id"
+                  value="{{ item.product.id }}"
+                />
+                <input
+                  type="number"
+                  name="quantity"
+                  value="{{ item.quantity }}"
+                  min="1"
+                  class="w-16 text-center border border-gray-300 rounded-md"
+                />
+                <button
+                  type="submit"
+                  class="ml-2 px-2 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600"
+                >
+                  Update
+                </button>
+              </form>
+            </td>
+            <td class="px-6 py-4">৳{{ item.product.price * item.quantity }}</td>
+            <td class="px-6 py-4">
+              <form
+                action="{{ url_for('order.remove_from_cart') }}"
+                method="POST"
+                class="inline-block"
+              >
+                <input
+                  type="hidden"
+                  name="product_id"
+                  value="{{ item.product.id }}"
+                />
+                <button type="submit" class="text-red-500 hover:text-red-700">
+                  Remove
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if cart_items|length != 0 %}
+
+    <div
+      class="flex justify-between items-center p-4 bg-gray-50 border rounded-md"
+    >
+      <span class="text-xl font-semibold">Total: ৳{{ total_price }}</span>
+      <div class="flex gap-4">
+        <a
+          href="{{ url_for('order.place_order') }}"
+          class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+          >Place Order</a
+        >
+        <a
+          href="{{ url_for('public.index') }}"
+          class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+          >Continue Shopping</a
+        >
+      </div>
+    </div>
+
+    {% endif %} {% if cart_items|length == 0 %}
+    <div role="alert" class="text-center py-6">
+      Your cart is currently empty.
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- User Order History Table -->
+  {% if order_history %}
+  <h2 class="text-2xl font-bold text-center py-4">Your Order History</h2>
+  <div class="overflow-x-auto pb-8">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b">
+          <th class="px-6 py-3 text-left">ID</th>
+          <th class="px-6 py-3 text-left">Date</th>
+          <th class="px-6 py-3 text-left">Status</th>
+          <th class="px-6 py-3 text-left">Products</th>
+          <th class="px-6 py-3 text-left">Total Price</th>
+          <th class="px-6 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in order_history %}
+        <tr class="border-b">
+          <td class="px-6 py-4" rowspan="{{ order.order_items|length }}">
+            {{ order.id }}
+          </td>
+          <td class="px-6 py-4" rowspan="{{ order.order_items|length }}">
+            {{ order.created_at.strftime('%I:%M:%S %p - %d %b %Y') }}
+          </td>
+          <td class="px-6 py-4" rowspan="{{ order.order_items|length }}">
+            {{ order.status }}
+          </td>
+
+          <td class="px-6 py-4">
+            {% for item in order.order_items %} {{ item.product["name"] }} ({{
+            item.quantity }}){% if not loop.last %}, {% endif %} {% endfor %}
+          </td>
+
+          <td class="px-6 py-4" rowspan="{{ order.order_items|length }}">
+            ৳{{ order.total_price }}
+          </td>
+
+          <td class="px-6 py-4" rowspan="{{ order.order_items|length }}">
+            {% if order.status == 'Pending' %}
+            <form
+              action="{{ url_for('order.cancel_order', order_id=order.id) }}"
+              method="POST"
+              class="inline-block"
+            >
+              <button
+                type="submit"
+                class="w-full text-center text-red-500 hover:text-red-700"
+              >
+                Cancel Order
+              </button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% for item in order.order_items %} {% if not loop.first %}
+        <tr class="border-b"></tr>
+        {% endif %} {% endfor %} {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-center py-6">You have no previous orders.</p>
+  {% endif %} {% if error %}
+  <div role="alert" class="text-center text-red-500 mt-4">{{ error }}</div>
+  {% endif %} {% endblock %}
+</div>

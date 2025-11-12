@@ -1,0 +1,129 @@
+{% extends 'parent.html' %} {% block title %}
+<title>Home | Grocery Store</title>
+{% endblock title %} {% block body %}
+
+<div class="flex flex-col gap-4 w-full">
+  <form
+    class="relative flex items-center gap-4"
+    action="{{ url_for('public.search') }}"
+    method="GET"
+  >
+    <input
+      type="text"
+      class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+      placeholder="Search..."
+      required
+      name="query"
+    />
+    <button
+      class="px-5 py-2.5 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm flex justify-center items-center gap-4"
+      type="submit"
+    >
+      Search
+      <svg
+        class="w-4 h-4 text-gray-500"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 20 20"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+        />
+      </svg>
+    </button>
+  </form>
+
+  {% if products %}
+  <div
+    class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center"
+  >
+    {% for product in products %}
+    <div
+      class="relative flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md {{ 'opacity-50 cursor-not-allowed' if product.quantity == 0 }}"
+    >
+      <a
+        class="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl"
+        href="{{ url_for('public.product_details', product_id=product.id) }}"
+      >
+        <img
+          class="object-cover w-full h-60"
+          src="{{ product.image }}"
+          alt="product image"
+          loading="lazy"
+        />
+      </a>
+      <div class="mt-4 p-4 flex flex-col justify-between h-1/2">
+        <a
+          href="{{ url_for('public.product_details', product_id=product.id) }}"
+          class="text-xl tracking-tight text-slate-900 flex-1"
+        >
+          {{ product.name }}
+        </a>
+        <div>
+          <div class="mt-2 mb-5 flex items-center justify-between">
+            <p>
+              <span class="text-3xl font-bold text-slate-900"
+                >৳{{ product.price }}</span
+              >
+            </p>
+            <p class="px-2 py-1 text-sm text-gray-600 bg-gray-200 rounded-md">
+              Stock - {{ product.quantity }}
+            </p>
+          </div>
+          <form
+            action="{{ url_for('order.add_to_cart') }}"
+            method="post"
+            class="flex"
+          >
+            <input type="hidden" name="product_id" value="{{ product.id }}" />
+            <button
+              type="submit"
+              class="flex-1 rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300 flex items-center justify-center gap-2 {{ 'pointer-events-none' if product.quantity == 0 }}"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="mr-2 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+              Add to Cart
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="w-full flex justify-center items-center px-4 py-8">
+    <div class="p-8 flex flex-col gap-4 w-96 shadow-xl rounded-lg bg-white">
+      <h2 class="text-2xl font-bold text-gray-800">No Products!</h2>
+      <p class="text-gray-700 -mt-2">
+        We couldn't find what you are looking for!
+      </p>
+      <div class="flex justify-end">
+        <a
+          href="{{ url_for('public.categories') }}"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+        >
+          View All Products
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
