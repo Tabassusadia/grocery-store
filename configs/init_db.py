@@ -11,8 +11,13 @@ def init_db():
 
     if not admin:
         hashed_password = generate_password_hash('admin123')
-        admin = Users(name='Admin User', email='admin@admin.com',
-                      password=hashed_password, is_admin=True)
+        admin = Users(
+            name='Admin User',
+            email='admin@admin.com',
+            password=hashed_password,
+            is_admin=True,
+            is_banned=False
+        )
         db.session.add(admin)
 
     db.session.commit()

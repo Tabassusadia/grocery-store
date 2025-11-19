@@ -209,6 +209,38 @@ def manage_users():
     return render_template('admin/manage/users.html', users=users, query=query)
 
 
+@admin_blueprint.route('/user/<int:user_id>/ban', methods=['POST'])
+def ban_user(user_id):
+    user = Users.query.get_or_404(user_id)
+
+    if user.is_admin:
+        flash("Admin accounts cannot be banned.", "danger")
+        return redirect(url_for('admin.manage_users'))
+
+    if user.is_banned:
+        flash(f"{user.name} is already banned.", "danger")
+    else:
+        user.is_banned = True
+        db.session.commit()
+        flash(f"{user.name} has been banned.", "success")
+
+    return redirect(url_for('admin.manage_users'))
+
+
+@admin_blueprint.route('/user/<int:user_id>/unban', methods=['POST'])
+def unban_user(user_id):
+    user = Users.query.get_or_404(user_id)
+
+    if not user.is_banned:
+        flash(f"{user.name} is already active.", "danger")
+    else:
+        user.is_banned = False
+        db.session.commit()
+        flash(f"{user.name} has been unbanned.", "success")
+
+    return redirect(url_for('admin.manage_users'))
+
+
 @admin_blueprint.route('/orders', methods=['GET'])
 def manage_orders():
     query = request.args.get('query')

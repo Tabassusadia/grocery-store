@@ -6,6 +6,7 @@ from models.Order import Order
 from models.OrderItem import OrderItem
 from models.Cart import Cart
 from models.Product import Product
+from models.User import Users
 
 order_blueprint = Blueprint('order', __name__, url_prefix='/order')
 
@@ -14,6 +15,12 @@ order_blueprint = Blueprint('order', __name__, url_prefix='/order')
 def check_user():
     if 'user_id' not in session:
         flash("You Must Be Logged In To Perform This Action.", "error")
+        return redirect(url_for('user.login'))
+
+    user = Users.query.get(session['user_id'])
+    if not user or user.is_banned:
+        session.clear()
+        flash("Your account has been banned. Please contact support for assistance.", "error")
         return redirect(url_for('user.login'))
 
 

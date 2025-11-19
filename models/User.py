@@ -8,6 +8,7 @@ class Users(db.Model):
     email = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    is_banned = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(
         db.DateTime, default=datetime.now, onupdate=datetime.now)
@@ -20,5 +21,6 @@ class Users(db.Model):
             'id': self.id,
             'name': self.name,
             'email': self.email,
-            'is_admin': self.is_admin
+            'is_admin': self.is_admin,
+            'is_banned': self.is_banned
         }
