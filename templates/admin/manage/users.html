@@ -66,6 +66,7 @@
             <th class="px-6 py-3 text-left border">Name</th>
             <th class="px-6 py-3 text-left border">Email</th>
             <th class="px-6 py-3 text-left border">Role</th>
+            <th class="px-6 py-3 text-left border">Status</th>
             <th class="px-6 py-3 text-left border">Registered On</th>
             <th class="px-6 py-3 border">Actions</th>
           </tr>
@@ -77,6 +78,11 @@
             <td class="px-6 py-4 border">{{ user.email }}</td>
             <td class="px-6 py-4 border">
               {{ 'Admin' if user.is_admin else 'User' }}
+            </td>
+            <td class="px-6 py-4 border">
+              <span class="{{ 'text-red-500' if user.is_banned else 'text-green-600' }}">
+                {{ 'Banned' if user.is_banned else 'Active' }}
+              </span>
             </td>
             <td class="px-6 py-4 border">
               {{ user.created_at.strftime('%I:%M:%S %p - %d %b %Y') }}
@@ -96,6 +102,23 @@
                     onclick="return confirm('Are you sure?')"
                   >
                     Delete
+                  </button>
+                </form>
+                <form
+                  action="{{
+                    url_for(
+                      'admin.unban_user' if user.is_banned else 'admin.ban_user',
+                      user_id=user.id
+                    )
+                  }}"
+                  method="POST"
+                >
+                  <button
+                    type="submit"
+                    class="{{ 'text-green-600' if user.is_banned else 'text-yellow-600' }} hover:underline"
+                    onclick="return confirm('Are you sure you want to {{ 'unban' if user.is_banned else 'ban' }} this user?');"
+                  >
+                    {{ 'Unban' if user.is_banned else 'Ban' }}
                   </button>
                 </form>
                 {% endif %}

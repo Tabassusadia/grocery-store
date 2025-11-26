@@ -1,0 +1,29 @@
+{% extends 'parent.html' %} {% block title %}
+<title>Error | Something Went Wrong</title>
+{% endblock title %} {% block body %}
+
+<section class="w-full">
+  <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+    <div class="mx-auto max-w-screen-sm text-center">
+      <h1
+        class="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-purple-600"
+      >
+        404
+      </h1>
+      <p
+        class="mb-4 text-3xl tracking-tight font-bold text-purple-500 md:text-4xl"
+      >
+        Something Went Wrong.
+      </p>
+      <p class="mb-4 text-lg font-light text-gray-500">{{ error }}</p>
+      <a
+        href="/"
+        class="inline-flex items-center justify-center px-4 py-2 text-base font-medium leading-6 text-gray-600 whitespace-no-wrap bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:shadow-none"
+      >
+        Home Page
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
